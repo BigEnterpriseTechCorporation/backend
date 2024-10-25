@@ -20,11 +20,6 @@ public class PrivateUserDto(User user)
     public string Login { get; set; } = user.Login;
 }
 
-public class LoginPasswordPair
-{
-    public string Login { get; set; }
-    public string Password { get; set; }
-}
 public class User
 {
     [Key]

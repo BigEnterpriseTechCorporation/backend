@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using Backend;
 using Backend.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -11,15 +12,27 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Backend.Controllers;
 
+public class LoginObject
+{
+    public string Login { get; set; }
+    public string Password { get; set; }
+}
+public class RegisterObject
+{
+    public string Login { get; set; }
+    public string Password { get; set; }
+    public string Name { get; set; }
+}
+
 [ApiController]
 [Route("api/[controller]")]
 public class AccountController(AppDbContext db) : ControllerBase
 {
     [AllowAnonymous]
     [HttpPost("token")]
-    public IActionResult Token([FromBody] LoginPasswordPair pair)
+    public IActionResult Token([FromBody] LoginObject obj)
     {
-        if (!GetIdentity(pair.Login, pair.Password, out var identity))
+        if (!GetIdentity(obj.Login, obj.Password, out var identity))
         {
             return BadRequest(new { status = "Invalid username or password." });
         }
@@ -48,56 +61,47 @@ public class AccountController(AppDbContext db) : ControllerBase
 
     [AllowAnonymous]
     [HttpPost("register")]
-    public IActionResult Register([FromForm]string login, [FromForm]string password, [FromForm]string username)
+    public IActionResult Register([FromBody] RegisterObject obj)
     {
-        /*(Func<string, bool>, string)[] factorsUsername =
+        (Func<string, bool>, string)[] factorsUsername =
         [
-            //(u => db.Users.Any(x => x.Login == u), "Login is already taken"),
-            (u => char.IsAscii(u[0]), "Login is alphanumeric"),
-            (u => u.Length < 3, $"Login is too short {login.Length < 3}"),
+            (u => db.Users.Any(x => x.Login == u), "Login is already taken"),
+            //(u => !char.IsLetter(u.First()), "Login is alphanumeric"),
+            (u => u.Length < 3, "Login is too short "),
             (u => u.Length > 20, "Login is too long"),
-            (u => u[..^1].Any(c => !char.IsLetterOrDigit(c)), "Login is invalid"),
+            (u => u[..^1].Any(c => !char.IsLetter(c)), "Login is invalid"),
         ];
         foreach (var (f, s) in factorsUsername)
         {
-            if (!f(login))
+            if (f(obj.Login))
             {
                 return BadRequest(new { status = s });
             }
         }
-
-        (Func<string, bool>, string)[] factorsPassword =
-        [
-            (p => p.Length >= 8, "Minimum Length"),
-            (p => p.Any(char.IsUpper), "Uppercase"),
-            (p => p.Any(char.IsLower), "Lowercase"),
-            (p => p.Any(ch => !char.IsLetterOrDigit(ch)), "Special Characters"),
-            (p => p.Any(char.IsDigit), "Digits")
-        ];
-        foreach (var (f, s) in factorsPassword)
+        
+        if (!new Regex("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,20}$")
+                .Match(obj.Password).Success
+            )
         {
-            if (!f(password))
-            {
-                return BadRequest(new { status = s });
-            }
-        }*/
-
-        if (username.Length > 50 && db.Users.Any(x => x.Login == login))
+            return BadRequest(new {status = "Password is not valid."});
+        }
+        
+        if (obj.Name.Length > 50)
         {
-            return BadRequest(new { status = "- Username is too long" });
+            return BadRequest(new { status = "Username is too long" });
         }
         
 
         var u = db.Users.Add(new User
         {
-            Name = username, 
-            Login = login, 
-            Password = Models.User.HashPassword(password), 
+            Name = obj.Name, 
+            Login = obj.Login, 
+            Password = Models.User.HashPassword(obj.Password), 
         });
 
         db.SaveChanges();
 
-        if (!GetToken(login, password, out var authToken, out var tokenExpires))
+        if (!GetToken(obj.Login, obj.Password, out var authToken, out var tokenExpires))
         {
             return BadRequest("Iternal server error");
         }
@@ -160,7 +164,7 @@ public class AccountController(AppDbContext db) : ControllerBase
 
     [Authorize]
     [HttpPost("self")]
-    public async Task<ActionResult<PrivateKeyStatus>> GetLoggedInUser()
+    public async Task<ActionResult<PrivateUserDto>> GetLoggedInUser()
     {
         var userId =
             Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value ??
