@@ -40,7 +40,6 @@ public class User
     [Index(IsUnique = true)]
     public string Login { get; set; }
     [StringLength(16)]
-    public string Role { get; set; } = "Guest";
     
     [DataType(DataType.Password)]
     public string Password { get; set; }
@@ -55,10 +54,9 @@ public class User
     public PrivateUserDto PrivateDto() => new PrivateUserDto(this);
 
 
-    public bool VerifyPassword(string password)
-    {
-        var hash = Encoding.ASCII.GetString(SHA256.HashData(Encoding.ASCII.GetBytes(password.Insert(4, ")yk!u)cA@79V"))));
-        return hash == Password;
-    }
+    public bool VerifyPassword(string password) => HashPassword(password) == Password;
+
+    public static string HashPassword(string password) =>
+        Encoding.ASCII.GetString(SHA256.HashData(Encoding.ASCII.GetBytes(password.Insert(4, ")yk!u)cA@79V"))));
 
 }

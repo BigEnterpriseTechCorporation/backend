@@ -31,7 +31,7 @@ public class DebugController : ControllerBase
             {
                 new (ClaimTypes.NameIdentifier, user.Id.ToString()), //user guid
                 new (ClaimsIdentity.DefaultNameClaimType, user.Login), // user login
-                new (ClaimsIdentity.DefaultRoleClaimType, user.Role) // user role
+                //new (ClaimsIdentity.DefaultRoleClaimType, user.Role) // user role
             };
             var claimsIdentity =
                 new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,
@@ -63,13 +63,4 @@ public class DebugController : ControllerBase
     {
         return Ok($"Ваш логин: {User.Identity.Name}");
     }
-         
-    [HttpGet]
-    [Authorize]
-    [Route("getrole")]
-    public IActionResult GetRole()
-    {
-        return Ok($"Ваша {User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Role)?.Value}");
-    }
-    
 }

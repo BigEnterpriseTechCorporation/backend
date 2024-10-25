@@ -1,3 +1,4 @@
+using System.Configuration;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -19,8 +20,7 @@ public class UsersController : ControllerBase
     {
         db = context;
         if (db.Users.Any()) return;
-        db.Users.Add(new User { Name = "Big Lebowski", Login = "admin", Password = Encoding.ASCII.GetString(SHA256.HashData(Encoding.ASCII.GetBytes("password".Insert(4, ")yk!u)cA@79V")))), Role = "Admin" });
-        db.Users.Add(new User { Name = "Alice", Login = "alice", Password = "alice2024" });
+        db.Users.Add(new User { Name = "Big Lebowski", Login = "admin", Password = Models.User.HashPassword("admin")});
         db.SaveChanges();
     }
     
