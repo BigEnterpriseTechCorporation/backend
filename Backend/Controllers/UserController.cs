@@ -18,13 +18,10 @@ public class UsersController : ControllerBase
     public UsersController(AppDbContext context)
     {
         db = context;
-        if (!db.Users.Any())
-        {
-            db.Users.Add(new User { Name = "Big Lebowski", Login = "admin", Email = "admin@localhost", Password = Encoding.ASCII.GetString(SHA256.HashData(Encoding.ASCII.GetBytes("password".Insert(4, ")yk!u)cA@79V")))), Role = "Admin" });
-            db.Users.Add(new User { Name = "Alice", Login = "alice", Email = "alice@mail.com", Password = "alice2024" });
-            db.Users.Add(new User { Name = "test", Login = "nigga", Email = "nig@mail", Password = "321"});
-            db.SaveChanges();
-        }
+        if (db.Users.Any()) return;
+        db.Users.Add(new User { Name = "Big Lebowski", Login = "admin", Password = Encoding.ASCII.GetString(SHA256.HashData(Encoding.ASCII.GetBytes("password".Insert(4, ")yk!u)cA@79V")))), Role = "Admin" });
+        db.Users.Add(new User { Name = "Alice", Login = "alice", Password = "alice2024" });
+        db.SaveChanges();
     }
     
     [AllowAnonymous]

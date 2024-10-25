@@ -18,8 +18,6 @@ public class PrivateUserDto(User user)
     public Guid Id { get; set; } = user.Id;
     public string Name { get; set; } = user.Name;
     public string Login { get; set; } = user.Login;
-    public string Email { get; set; } = user.Email;
-    public string Description { get; set; } = user.Description;
 }
 
 public class LoginPasswordPair
@@ -33,33 +31,24 @@ public class User
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
     
-    [StringLength(32)]
+    [StringLength(50)]
     [Required]
     public string Name { get; set; }
     
-    [StringLength(32)]
+    [StringLength(20)]
+    [Required]
+    [Index(IsUnique = true)]
     public string Login { get; set; }
     [StringLength(16)]
-    public string Role { get; set; } = "Member";
+    public string Role { get; set; } = "Guest";
     
     [DataType(DataType.Password)]
     public string Password { get; set; }
     [StringLength(32)]
-    [DataType(DataType.EmailAddress)]
-    public string Email { get; set; }
-    [StringLength(1024)]
-    public string Description { get; set; } = "";
     
     [DataType(DataType.Time)]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
-    public DateTime LastActivity { get; set; }
-    public DateTime Birth { get; set; }
-    public uint Rating { get; set; }
-    /*
-     * награды
-     */
-
     public byte[]? Avatar { get; set; }
 
     public PublicUserDto PublicDto() => new PublicUserDto(this);
