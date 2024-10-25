@@ -45,38 +45,47 @@ public class AccountController(AppDbContext db) : ControllerBase
 
     [AllowAnonymous]
     [HttpPost("register")]
-    public IActionResult Register(string username, string password)
+    public IActionResult Register(string login, string password, string username)
     {
         (Func<string, bool>, string)[] factorsUsername =
         [
-            (u => db.Users.Any(x => x.Login == u), "Username is already taken."),
-            (u => char.IsAscii(u[0]), "Username is alphanumeric."),
-            (u => u.Length < 3, "Username is too short."),
-            (u => u.Length < 100, "Username is too long."),
-            (u => u[..^1].Any(c => !char.IsLetterOrDigit(c)), "Username is invalid."),
+            (u => db.Users.Any(x => x.Login == u), "0 Login is already taken."),
+            (u => char.IsAscii(u[0]), "1 Login is alphanumeric."),
+            (u => u.Length < 3, "2 Login is too short."),
+            (u => u.Length < 20, "3 Login is too long."),
+            (u => u[..^1].Any(c => !char.IsLetterOrDigit(c)), "4 Login is invalid."),
 
         ];
-        foreach (var (f, s) in factorsUsername) {
-            if (!f(username)) {
+        foreach (var (f, s) in factorsUsername)
+        {
+            if (!f(login))
+            {
                 return BadRequest(new { status = s });
             }
         }
-        
+
         (Func<string, bool>, string)[] factorsPassword =
         [
-            (p => p.Length >= 8, "Minimum Length"),
-            (p => p.Any(char.IsUpper), "Uppercase"),
-            (p => p.Any(char.IsLower), "Lowercase"),
-            (p => p.Any(ch => !char.IsLetterOrDigit(ch)), "Special Characters"),
-            (p => p.Any(char.IsDigit), "Digits")
+            (p => p.Length >= 8, "5 Minimum Length"),
+            (p => p.Any(char.IsUpper), "6 Uppercase"),
+            (p => p.Any(char.IsLower), "7 Lowercase"),
+            (p => p.Any(ch => !char.IsLetterOrDigit(ch)), "8 Special Characters"),
+            (p => p.Any(char.IsDigit), "9 Digits")
         ];
-        foreach (var (f, s) in factorsPassword) {
-            if (!f(password)) {
-                return BadRequest(new { status = $"Dont follows criteria: {s}" });
+        foreach (var (f, s) in factorsPassword)
+        {
+            if (!f(password))
+            {
+                return BadRequest(new { status = s });
             }
         }
-        
-        var resp = new
+
+        if (username.Length > 50)
+        {
+            return BadRequest(new { status = "- Username is too long" });
+        }
+
+    var resp = new
         {
             status = "success",
             

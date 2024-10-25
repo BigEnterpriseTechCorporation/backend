@@ -65,11 +65,11 @@ public class DebugController : ControllerBase
     }
          
     [HttpGet]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     [Route("getrole")]
     public IActionResult GetRole()
     {
-        return Ok("Ваша роль: администратор");
+        return Ok($"Ваша {User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Role)?.Value}");
     }
     
 }
