@@ -19,6 +19,8 @@ public class Card
     
     public Guid GroupId { get; set; }
     
+    public List<Guid> AssignedUsers { get; set; } = [];
+    
     [MaxLength(500)]
     public string Content { get; set; }
 }
