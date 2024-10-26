@@ -9,7 +9,7 @@ public sealed class AppDbContext : DbContext
     public DbSet<Board> Boards { get; set; }
     public DbSet<Group> Groups { get; set; }
     public DbSet<Card> Cards { get; set; }
-    public DbSet<BoardUser> BoardUsers { get; set; }
+    //public DbSet<BoardUser> BoardUsers { get; set; }
     public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options)
     { 
@@ -32,25 +32,25 @@ public sealed class AppDbContext : DbContext
         modelBuilder.Entity<BoardUser>()
             .HasOne(bu => bu.Board)
             .WithMany(b => b.BoardUsers)
-            .HasForeignKey(bu => bu.BoardId);
+            .HasForeignKey(bu => bu.BoardId);*/
 
-        modelBuilder.Entity<BoardUser>()
-            .HasOne(bu => bu.User)
-            .WithMany(u => u.BoardUsers)
-            .HasForeignKey(bu => bu.UserId);
+        //modelBuilder.Entity<BoardUser>()
+         //   .HasOne(bu => bu.User)
+         //   .WithMany(u => u.Boards)
+            //.HasForeignKey(bu => bu.UserId);
 
         // Configure one-to-many relationship between Board and Group
-        modelBuilder.Entity<Board>()
+       /* modelBuilder.Entity<Board>()
             .HasMany(b => b.Groups)
             .WithOne(g => g.Board)
-            .HasForeignKey(g => g.BoardId);
+            .HasForeignKey(g => g.Board);
 
         // Configure one-to-many relationship between Group and Card
         modelBuilder.Entity<Group>()
             .HasMany(g => g.Cards)
             .WithOne(c => c.Group)
-            .HasForeignKey(c => c.GroupId);*/
-        modelBuilder.Entity<BoardUser>()
-            .HasKey(bu => new { bu.BoardId, bu.UserId });
+            .HasForeignKey(c => c.GroupId);
+        //modelBuilder.Entity<BoardUser>()
+         //   .HasKey(bu => new { bu.BoardId, bu.UserId });*/
     }
 }

@@ -16,10 +16,8 @@ public class Board
     [DataType(DataType.Time)]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public DateTime CreatedAt { get; init; }
-/*
-    public ICollection<BoardUser> BoardUsers { get; set; } = new List<BoardUser>();
-    public ICollection<Group> Groups { get; set; } = new List<Group>();*/
-    public User? Creator { get; set; }
-    public ICollection<BoardUser> BoardUsers { get; set; }
-    public ICollection<Group> Groups { get; set; }
+    
+    public List<Guid> Groups { get; set; } = [];
+    public List<Guid> Users { get; set; } = [];
+    public List<Guid> Admins { get; set; } = [];
 }

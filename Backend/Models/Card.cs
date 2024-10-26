@@ -16,10 +16,9 @@ public class Card
     [DataType(DataType.Time)]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public DateTime CreatedAt { get; set; }
-
     
     public Guid GroupId { get; set; }
-    public Group Group { get; set; } = null!;
     
+    [MaxLength(500)]
     public string Content { get; set; }
 }

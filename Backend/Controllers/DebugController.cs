@@ -67,10 +67,10 @@ public class DebugController : ControllerBase
     }
 
     [HttpGet]
-    [Route("boardusers")]
-    public async Task<List<BoardUser>> GetBoardUsers()
+    [Route("boardsusers")]
+    public List<Guid> GetBoardUsers(Guid id)
     {
-        return await db.BoardUsers.ToListAsync();
+        return db.Boards.Find(id).Users.ToList();
     }
 
     [HttpGet]

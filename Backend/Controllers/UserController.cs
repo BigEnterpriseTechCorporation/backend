@@ -55,8 +55,22 @@ public class UsersController : ControllerBase
         return NotFound();
     }
     
+    [AllowAnonymous]
+    [HttpGet("Avatar")]
+    public async Task<ActionResult> GetSelfAvatar()
+    {
+        var userId =
+            Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value ??
+                       string.Empty);
+        var user = await db.Users.FirstOrDefaultAsync(x => x.Id == userId);
+        if (user == null)
+            return NotFound();
+        if (user.Avatar != null) return new FileContentResult(user.Avatar, "image/webp");
+        return NotFound();
+    }
+    
     [Authorize]
-    [HttpPut("updateAvatar")]
+    [HttpPut("putAvatar")]
     public async Task<ActionResult> UpdateAvatar([FromForm] IFormFile file)
     {
         if(!file.ContentType.Contains("image"))
