@@ -84,7 +84,7 @@ public class GroupController(AppDbContext db) : ControllerBase
     
     //MOVE Card
     [Authorize]
-    [HttpPost("{id:guid}/edit/card")]
+    [HttpPost("{id:guid}/move/card")]
     public async Task<IActionResult> MoveCard(Guid id, Guid newGroupId)
     {
         if (!ModelState.IsValid)

@@ -9,6 +9,13 @@ public class CommentRequest
     public string Content { get; set; }
 }
 
+public class CommentExport
+{
+    public string Content { get; set; }
+    public string Owner { get; set; }
+
+}
+
 public class Comment
 {
     [Key]

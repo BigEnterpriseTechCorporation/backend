@@ -3,6 +3,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Backend.Models;
 
+public class CardExport
+{
+    public string Name { get; set; }
+    public List<string> AssignedUsers { get; set; } = [];
+    public List<CommentExport> Comments { get; set; } = [];
+    public string Content { get; set; }
+}
+
 public class Card
 {
     [Key]
