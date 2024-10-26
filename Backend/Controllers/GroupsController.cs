@@ -12,7 +12,6 @@ namespace Backend.Controllers;
 public class AddCardToGroupInBoard
 {
     public string Title { get; set; }
-    public Guid GroupId { get; set; }
     public string Content { get; set; }
     public List<Guid> AssignedUsers { get; set; }
 }
@@ -27,6 +26,7 @@ public class RenameGroup
 [Route("api/[controller]")]
 public class GroupController(AppDbContext db) : ControllerBase
 {
+    //CREATE Card
     [Authorize]
     [HttpPost("{id:guid}/add/card")]
     public async Task<IActionResult> AddCardToGroupInBoard(Guid id, [FromBody]AddCardToGroupInBoard request)
@@ -39,22 +39,29 @@ public class GroupController(AppDbContext db) : ControllerBase
         var userId = Guid.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty);
         
         var board = await db.Boards.SingleOrDefaultAsync(x => x.Id == id);
-        
-        if(!db.Groups.Any(g => g.Id == request.GroupId)) return NotFound();
 
-        var c = new Card()
+        var g = await db.Groups.FindAsync(id);
+        
+        if(g == null) return NotFound();
+
+        var c = new Card
         {
             Id = Guid.NewGuid(),
             Name = request.Title,
-            GroupId = request.GroupId,
+            GroupId = id,
             Content = request.Content,
             AssignedUsers = request.AssignedUsers,
             CreatedAt = DateTime.Now
         };
+        g.Cards.Add(c.Id);
+        db.Cards.Add(c);
+        await db.SaveChangesAsync();
+        
         
         return Ok();
     }
     
+    //RENAME group
     [Authorize]
     [HttpPost("{id:guid}/rename")]
     public async Task<IActionResult> RenameGroup(Guid id, [FromBody] RenameGroup req)

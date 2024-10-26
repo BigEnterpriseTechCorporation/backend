@@ -47,7 +47,7 @@ public class BoardController(AppDbContext db) : ControllerBase
     }
     
     //CREATE Board
-    [HttpPost]
+    [HttpPost("create")]
     public async Task<IActionResult> CreateBoard([FromBody] CreateBoardRequest request)
     {
         if (!ModelState.IsValid)
@@ -72,6 +72,7 @@ public class BoardController(AppDbContext db) : ControllerBase
         board.Users.Add(userId);
         board.Admins.Add(userId);
         db.Boards.Add(board);
+        user.Boards.Add(board.Id);
         
         await db.SaveChangesAsync();
 
