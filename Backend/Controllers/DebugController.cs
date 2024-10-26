@@ -1,8 +1,10 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Backend;
+using Backend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Backend.Controllers;
@@ -62,5 +64,24 @@ public class DebugController : ControllerBase
     public IActionResult GetLogin()
     {
         return Ok($"Ваш логин: {User.Identity.Name}");
+    }
+
+    [HttpGet]
+    [Route("boardusers")]
+    public async Task<List<BoardUser>> GetBoardUsers()
+    {
+        return await db.BoardUsers.ToListAsync();
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("self")]
+    public JsonResult GetSelf()
+    {
+        var userId =
+            Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value ??
+                       string.Empty);
+        var user =  db.Users.FirstOrDefaultAsync(x => x.Id == userId);
+        return new JsonResult(user);
     }
 }

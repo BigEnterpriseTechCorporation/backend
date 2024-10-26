@@ -44,6 +44,9 @@ public class User
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public DateTime CreatedAt { get; set; }
     public byte[]? Avatar { get; set; }
+    
+    public ICollection<Board> Boards { get; set; }
+    //public ICollection<BoardUser> BoardUsers { get; set; } = new List<BoardUser>();
 
     public PublicUserDto PublicDto() => new PublicUserDto(this);
     public PrivateUserDto PrivateDto() => new PrivateUserDto(this);
