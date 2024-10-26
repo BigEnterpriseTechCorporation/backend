@@ -164,15 +164,15 @@ public class AccountController(AppDbContext db) : ControllerBase
     }
 
     [Authorize]
-    [HttpPost("self")]
+    [HttpGet("self")]
     public async Task<ActionResult<PrivateUserDto>> GetLoggedInUser()
     {
         var userId =
             Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value ??
                        string.Empty);
-        var user = await db.Users.FirstOrDefaultAsync(x => x.Id == userId);
+        var user = await db.Users.FindAsync(userId);
         if (user == null)
-            return NotFound();
+            return BadRequest();
         return new ObjectResult(user.PrivateDto());
     }
 }
