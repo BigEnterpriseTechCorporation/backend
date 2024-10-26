@@ -25,12 +25,13 @@ public class RegisterObject
 }
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class AccountController(AppDbContext db) : ControllerBase
 {
     [AllowAnonymous]
     [HttpPost("token")]
-    public IActionResult Token([FromBody] LoginObject obj)
+    public IActionResult Token([FromForm] LoginObject obj)
     {
         if (!GetIdentity(obj.Login, obj.Password, out var identity))
         {
@@ -61,7 +62,7 @@ public class AccountController(AppDbContext db) : ControllerBase
 
     [AllowAnonymous]
     [HttpPost("register")]
-    public IActionResult Register([FromBody] RegisterObject obj)
+    public IActionResult Register([FromForm] RegisterObject obj)
     {
         (Func<string, bool>, string)[] factorsUsername =
         [

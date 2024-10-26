@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
 using Serilog.Filters;
@@ -67,23 +68,46 @@ public class Program
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
-                options.UseSecurityTokenValidators = true;
-                options.RequireHttpsMetadata = false;
+                //options.UseSecurityTokenValidators = false;
+                //options.RequireHttpsMetadata = false;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true, // укзывает, будет ли валидироваться издатель при валидации токена
                     ValidIssuer = TokenOptions.Issuer, // строка, представляющая издателя
-                    ValidateAudience = true, // будет ли валидироваться потребитель токена
-                    ValidAudience = TokenOptions.Audience, // установка потребителя токена
-                    ValidateLifetime = true, // будет ли валидироваться время существования
+                    //ValidateAudience = true, // будет ли валидироваться потребитель токена
+                    //ValidAudience = TokenOptions.Audience, // установка потребителя токена
+                    //ValidateLifetime = true, // будет ли валидироваться время существования
                     IssuerSigningKey = TokenOptions.GetSymmetricSecurityKey(), // установка ключа безопасности
-                    ValidateIssuerSigningKey = true, // валидация ключа безопасности
+                    //ValidateIssuerSigningKey = true, // валидация ключа безопасности
                 };
+                
             });
 
         
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        builder.Services.AddSwaggerGen(c =>
+        {
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+            {
+                Name = "Authorization",
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 1safsfsdfdfd\"",
+            });
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement {
+                {
+                    new OpenApiSecurityScheme {
+                        Reference = new OpenApiReference {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    new string[] {}
+                }
+            });
+        });
 
         builder.Services.AddControllers();
         
@@ -108,9 +132,9 @@ public class Program
         
         app.UseRouting();
         
+        app.UseAuthentication();
         app.UseAuthorization();
-        app.UseAuthorization();
-
+        
         app.MapDefaultControllerRoute();
             //.WithOpenApi();
 
