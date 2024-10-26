@@ -7,8 +7,8 @@ public class Group
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public Guid Id { get; set; }
-    
+    public Guid Id { get; set; } = Guid.NewGuid();
+
     [StringLength(50)]
     [Required]
     public string Name { get; set; }
@@ -17,8 +17,6 @@ public class Group
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public DateTime CreatedAt { get; set; }
     
-    public List<Guid> CardsIds { get; set; }
-    [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-    [ForeignKey("CardsIds")]
-    public List<Card> Cards { get; set; }
+    public Guid BoardId { get; set; }
+    public List<Guid> Cards { get; set; } = new List<Guid>();
 }
