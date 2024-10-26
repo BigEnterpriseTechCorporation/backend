@@ -3,24 +3,25 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Backend.Models;
 
-public class Card
+public class CommentRequest
+{
+    [MaxLength(500)]
+    public string Content { get; set; }
+}
+
+public class Comment
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
     
-    [StringLength(50)]
-    [Required]
-    public string Name { get; set; }
-    
     [DataType(DataType.Time)]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public DateTime CreatedAt { get; set; }
     
-    public Guid GroupId { get; set; }
+    public Guid Card { get; set; }
     
-    public List<Guid> AssignedUsers { get; set; } = [];
-    public List<Guid> Comments { get; set; } = [];
+    public Guid Owner { get; set; }
     
     [MaxLength(500)]
     public string Content { get; set; }
