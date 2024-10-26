@@ -1,4 +1,5 @@
 using System.Configuration;
+using System.Data.Entity.Core.Objects;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SkiaSharp;
+using ObjectResult = Microsoft.AspNetCore.Mvc.ObjectResult;
 
 namespace Backend.Controllers;
 
@@ -24,6 +26,7 @@ public class UsersController : ControllerBase
         db.SaveChanges();
     }
     
+    //GET User list
     [AllowAnonymous]
     [HttpGet]
     public async Task<List<PublicUserDto>> Get()
@@ -31,7 +34,7 @@ public class UsersController : ControllerBase
         return await db.Users.Select(u => u.PublicDto()).ToListAsync();
     }
 
-    // GET api/users/5
+    //GET Users by id
     [AllowAnonymous]
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<PublicUserDto>> Get(Guid id)
@@ -42,6 +45,7 @@ public class UsersController : ControllerBase
         return new ObjectResult(user.PublicDto());
     }
     
+    //GET Avatar by user id
     [AllowAnonymous]
     [HttpGet("{id:guid}/avatar")]
     public async Task<ActionResult> GetAvatar(Guid id)
@@ -53,6 +57,7 @@ public class UsersController : ControllerBase
         return NotFound();
     }
     
+    //PUT Avatar
     [Authorize]
     [HttpPut("putAvatar")]
     public async Task<ActionResult> UpdateAvatar(/*[FromForm]*/ IFormFile file)
@@ -78,18 +83,10 @@ public class UsersController : ControllerBase
         return Ok();
     }
     
-    // DELETE api/users/5
-    [Authorize(Roles = "Admin")]
-    [HttpDelete("{id:guid}")]
-    public async Task<ActionResult> Delete(Guid id)
+    [AllowAnonymous]
+    [HttpGet("{userId:guid}/tasks")]
+    public Task<IQueryable<Card>> GetTasks(Guid userId)
     {
-        var user = db.Users.FirstOrDefault(x => x.Id == id);
-        if (user == null)
-        {
-            return NotFound();
-        }
-        db.Users.Remove(user);
-        await db.SaveChangesAsync();
-        return Ok();
+        return Task.FromResult(db.Cards.Where(c => c.AssignedUsers.Contains(userId)));
     }
 }

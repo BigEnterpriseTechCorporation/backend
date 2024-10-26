@@ -61,7 +61,7 @@ public class GroupController(AppDbContext db) : ControllerBase
         return Ok();
     }
     
-    //CREATE Card
+    //EDIT Card
     [Authorize]
     [HttpPost("{id:guid}/edit/card")]
     public async Task<IActionResult> EditCard(Guid id, [FromBody]AddCardToGroupInBoard request)
@@ -76,6 +76,29 @@ public class GroupController(AppDbContext db) : ControllerBase
         c.Content = request.Content;
         c.Name = request.Title;
         c.AssignedUsers = request.AssignedUsers;
+        
+        await db.SaveChangesAsync();
+        
+        return Ok();
+    }
+    
+    //MOVE Card
+    [Authorize]
+    [HttpPost("{id:guid}/edit/card")]
+    public async Task<IActionResult> MoveCard(Guid id, Guid newGroupId)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var c = await db.Cards.SingleOrDefaultAsync(x => x.Id == id);
+       
+        var og = await db.Groups.FindAsync(c.GroupId);
+        og.Cards.Remove(c.Id);
+        c.GroupId = newGroupId;
+        var ng = await db.Groups.FindAsync(newGroupId);
+        ng.Cards.Add(c.Id);
         
         await db.SaveChangesAsync();
         

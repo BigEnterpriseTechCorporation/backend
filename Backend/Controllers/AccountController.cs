@@ -1,3 +1,4 @@
+using System.Configuration;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -22,6 +23,12 @@ public class RegisterObject
     public string Login { get; set; }
     public string Password { get; set; }
     public string Name { get; set; }
+}
+
+public class UserPatch
+{
+    public string Name { get; set; }
+    public string JobTitle { get; set; }
 }
 
 [ApiController]
@@ -163,6 +170,7 @@ public class AccountController(AppDbContext db) : ControllerBase
         return true;
     }
 
+    //GET Self
     [Authorize]
     [HttpGet("self")]
     public async Task<ActionResult<PrivateUserDto>> GetLoggedInUser()
@@ -174,5 +182,45 @@ public class AccountController(AppDbContext db) : ControllerBase
         if (user == null)
             return BadRequest();
         return new ObjectResult(user.PrivateDto());
+    }
+    
+    //DELETE User
+    [Authorize]
+    [HttpDelete("delete")]
+    public async Task<ActionResult> Delete()
+    {
+        var userId =
+            Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value ??
+                       string.Empty);
+        
+        var user = await db.Users.FindAsync(userId);
+        
+        if (user == null) return NotFound();
+        
+        db.Users.Remove(user);
+        
+        await db.SaveChangesAsync();
+        return Ok();
+    }
+    
+    //PATCH User
+    [Authorize]
+    [HttpPut("edit")]
+    public async Task<ActionResult> Edit([FromBody] UserPatch obj)
+    {
+        var userId =
+            Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value ??
+                       string.Empty);
+        
+        var user = await db.Users.FindAsync(userId);
+        
+        if (user == null) return NotFound();
+        
+        //update user
+        user.JobTitle = obj.JobTitle;
+        user.Name = obj.Name;
+        
+        await db.SaveChangesAsync();
+        return Ok();
     }
 }
