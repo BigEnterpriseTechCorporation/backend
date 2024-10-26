@@ -55,10 +55,35 @@ public class GroupController(AppDbContext db) : ControllerBase
         };
         g.Cards.Add(c.Id);
         db.Cards.Add(c);
+        
         await db.SaveChangesAsync();
         
-        
         return Ok();
+    }
+    
+    //Get Cards ids
+    [AllowAnonymous]
+    [HttpPost("{id:guid}/get/ids")]
+    public async Task<IActionResult> GetCardsFromGroupInBoard(Guid id)
+    {
+        var g = await db.Groups.FindAsync(id);
+        
+        if(g == null) return NotFound();
+        
+        return Ok(g.Cards.ToList());
+    }
+    
+    //Get Cards ids
+    [AllowAnonymous]
+    [HttpPost("{id:guid}/get/full")]
+    public async Task<IActionResult> GetFullCardsFromGroupInBoard(Guid id)
+    {
+        var g = await db.Groups.FindAsync(id);
+        
+        if(g == null) return NotFound();
+        
+        //! POSSIBLE PERFORMANCE ISSUES
+        return Ok(db.Cards.Where(t => g.Cards.Contains(t.Id))); 
     }
     
     //RENAME group

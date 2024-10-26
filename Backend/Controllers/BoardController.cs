@@ -76,7 +76,7 @@ public class BoardController(AppDbContext db) : ControllerBase
         
         await db.SaveChangesAsync();
 
-        return Ok(new { Id = board.Id });
+        return Ok(board.Id);
     }
 
     //ADD User to board by boardID
