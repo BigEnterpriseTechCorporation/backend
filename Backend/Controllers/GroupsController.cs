@@ -61,6 +61,27 @@ public class GroupController(AppDbContext db) : ControllerBase
         return Ok();
     }
     
+    //CREATE Card
+    [Authorize]
+    [HttpPost("{id:guid}/edit/card")]
+    public async Task<IActionResult> EditCard(Guid id, [FromBody]AddCardToGroupInBoard request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var c = await db.Cards.SingleOrDefaultAsync(x => x.Id == id);
+        
+        c.Content = request.Content;
+        c.Name = request.Title;
+        c.AssignedUsers = request.AssignedUsers;
+        
+        await db.SaveChangesAsync();
+        
+        return Ok();
+    }
+    
     //Get Cards ids
     [AllowAnonymous]
     [HttpPost("{id:guid}/get/ids")]

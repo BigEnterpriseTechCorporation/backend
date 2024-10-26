@@ -17,6 +17,8 @@ public class Card
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public DateTime CreatedAt { get; set; }
     
+    public DateTime EditedAt { get; set; }
+    
     public Guid GroupId { get; set; }
     
     public List<Guid> AssignedUsers { get; set; } = [];
