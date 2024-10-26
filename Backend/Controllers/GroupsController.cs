@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Azure.Core;
 using Backend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -14,6 +15,11 @@ public class AddCardToGroupInBoard
     public Guid GroupId { get; set; }
     public string Content { get; set; }
     public List<Guid> AssignedUsers { get; set; }
+}
+
+public class RenameGroup
+{
+    public string Name { get; set; }
 }
 
 
@@ -46,8 +52,27 @@ public class GroupController(AppDbContext db) : ControllerBase
             CreatedAt = DateTime.Now
         };
         
+        return Ok();
+    }
+    
+    [Authorize]
+    [HttpPost("{id:guid}/rename")]
+    public async Task<IActionResult> RenameGroup(Guid id, [FromBody] RenameGroup req)
+    {
+        if(!ModelState.IsValid) return BadRequest(ModelState);
         
+        var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value ?? string.Empty);
         
+        var g = await db.Groups.FindAsync(id);
+        
+        var board = await db.Boards.SingleOrDefaultAsync(x => g != null && x.Id == g.BoardId);
+
+        if(board == null | g == null) return BadRequest();
+        if (board != null && !board.Admins.Contains(userId)) return BadRequest();
+
+        if (g != null) g.Name = req.Name;
+
+        await db.SaveChangesAsync();
         return Ok();
     }
 }

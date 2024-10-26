@@ -13,6 +13,7 @@ public class PublicUserDto(User user)
     public Guid Id { get; set; } = user.Id;
     public string Name { get; set; } = user.Name;
     public DateTime CreatedAt { get; set; } = user.CreatedAt;
+    public string JobTitle { get; set; } = user.JobTitle;
 }
 
 public class PrivateUserDto(User user)
@@ -50,6 +51,8 @@ public class User
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public DateTime CreatedAt { get; set; }
     public byte[]? Avatar { get; set; }
+
+    public string JobTitle { get; set; } = string.Empty;
 
     public List<Guid> Boards { get; set; } = [];
     //public ICollection<BoardUser> BoardUsers { get; set; } = new List<BoardUser>();

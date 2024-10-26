@@ -6,6 +6,7 @@ namespace Backend.Models;
 public class Group
 {
     [Key]
+    [Index(IsUnique = true)]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; } = Guid.NewGuid();
 
