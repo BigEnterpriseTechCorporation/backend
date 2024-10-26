@@ -74,11 +74,11 @@ public class Program
                 {
                     ValidateIssuer = true, // укзывает, будет ли валидироваться издатель при валидации токена
                     ValidIssuer = TokenOptions.Issuer, // строка, представляющая издателя
-                    //ValidateAudience = true, // будет ли валидироваться потребитель токена
-                    //ValidAudience = TokenOptions.Audience, // установка потребителя токена
-                    //ValidateLifetime = true, // будет ли валидироваться время существования
+                    ValidateAudience = true, // будет ли валидироваться потребитель токена
+                    ValidAudience = TokenOptions.Audience, // установка потребителя токена
+                    ValidateLifetime = true, // будет ли валидироваться время существования
                     IssuerSigningKey = TokenOptions.GetSymmetricSecurityKey(), // установка ключа безопасности
-                    //ValidateIssuerSigningKey = true, // валидация ключа безопасности
+                    ValidateIssuerSigningKey = true, // валидация ключа безопасности
                 };
                 
             });
